@@ -23,6 +23,9 @@ namespace Jamie {
             };
             _client = new DiscordSocketClient(config);
 
+            //Reads token from source
+            _token = File.ReadAllText("..\\..\\..\\token.txt");
+
             //Adds meta events
             _client.Log += Log;
             _client.Ready += Ready;
@@ -50,8 +53,6 @@ namespace Jamie {
         /// Prepares functions for the bot, such as time and new commands (if needed).
         /// </summary>
         private Task Ready() {
-
-            _token = File.ReadAllText("token.txt");
 
             return Task.CompletedTask;
         }
