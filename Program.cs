@@ -1,13 +1,13 @@
 ﻿using Discord;
+using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
 
-namespace Jamie {
+namespace JamieBot {
     public class Program {
 
-        private DiscordSocketClient _client;
-
-        private string _token;
+        public static DiscordSocketClient? _client;
+        private string? _token;
 
         public static Task Main(string[] args) => new Program().MainAsync();
 
@@ -30,7 +30,12 @@ namespace Jamie {
             _client.Log += Log;
             _client.Ready += Ready;
 
+            //Adds handlers
+            Handlers handlers = new Handlers(_client);
+
             //Adds command events
+            _client.GuildMemberUpdated += handlers.GuildMemberUpdatedHandler;
+
 
             //Starts bot
             await _client.LoginAsync(TokenType.Bot, _token);
