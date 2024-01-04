@@ -1,10 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JamieBot {
     internal class Handlers {
@@ -14,6 +9,9 @@ namespace JamieBot {
         public Handlers(DiscordSocketClient client) {
             _client = client;
         }
+
+        private bool nightMessage = false;
+        private DateTime nightMessageTime;
 
         public async Task GuildMemberUpdatedHandler(Cacheable<SocketGuildUser, ulong> beforeCache, SocketGuildUser afterUser) {
             
@@ -37,6 +35,32 @@ namespace JamieBot {
                         $"May they reflect on their heinous act and strive for a more alphabetically appropriate name in the future.");
                 } 
             } 
+        }
+
+        public async void CheckRandomCondition(object state) {
+
+            DateTime nowEst = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+
+            if(nowEst.Hour == 4 && nowEst.Minute == 0) { //Checking for daily random values at 4:00
+                
+                if(new Random().Next(1,11) == 1) { //Generating chance for random bot message between 11:00PM-1:30AM
+                    
+                    Random random = new Random();
+
+                    int randomHours = random.Next(23, 26); //Gets a time between 11:00 and 1:30
+                    int randomMinutes = (randomHours == 26) ? random.Next(0, 30) : random.Next(0, 60);
+                    this.nightMessageTime = DateTime.Now.Date.AddHours(randomHours).AddMinutes(randomMinutes);
+                    nightMessage = true;
+                }
+            }
+            else if(nowEst.Hour == 3 && nowEst.Minute == 59) { //Resets all conditions at night 
+                this.nightMessage = false;
+            }
+
+            if(this.nightMessage && nowEst == this.nightMessageTime) {
+                var chnl = _client.GetChannel(1094701047898964078) as IMessageChannel; //general channel ID 
+                await chnl.SendMessageAsync("Who up glonking they guy?"); //TODO: add other possible messages to send
+            }
         }
     }
 }
