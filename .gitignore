@@ -3,8 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-#Tokens and anonymous data
+#Tokens and anonymous / local  data
 token.txt
+data.json
 
 # User-specific files
 *.rsuser
