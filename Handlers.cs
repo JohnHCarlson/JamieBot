@@ -38,7 +38,6 @@ namespace JamieBot {
         }
 
         public async void CheckRandomCondition(object state) {
-
             DateTime nowEst = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
 
             if(nowEst.Hour == 4 && nowEst.Minute == 0) { //Checking for daily random values at 4:00
