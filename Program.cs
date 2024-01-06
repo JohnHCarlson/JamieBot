@@ -1,13 +1,17 @@
 ﻿using Discord;
+using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
 
-namespace Jamie {
+namespace JamieBot {
     public class Program {
 
-        private DiscordSocketClient _client;
+        public static DiscordSocketClient? _client;
+        private string? _token;
+        private Timer _timer;
 
-        private string _token;
+        Handlers handlers;
+        Commands commands;
 
         public static Task Main(string[] args) => new Program().MainAsync();
 
@@ -30,7 +34,13 @@ namespace Jamie {
             _client.Log += Log;
             _client.Ready += Ready;
 
+            //Adds handlers
+            handlers = new Handlers(_client);
+            commands = new Commands(_client);
+
             //Adds command events
+            _client.GuildMemberUpdated += handlers.GuildMemberUpdatedHandler;
+            _client.SlashCommandExecuted += commands.SlashCommandHandler;
 
             //Starts bot
             await _client.LoginAsync(TokenType.Bot, _token);
@@ -52,9 +62,11 @@ namespace Jamie {
         /// <summary>
         /// Prepares functions for the bot, such as time and new commands (if needed).
         /// </summary>
-        private Task Ready() {
+        private async Task Ready() {
 
-            return Task.CompletedTask;
+            _timer = new Timer(handlers.CheckRandomCondition, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+
+            //await Utilities.CreateCommands(_client);
         }
     }
 }
