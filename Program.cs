@@ -8,6 +8,10 @@ namespace JamieBot {
 
         public static DiscordSocketClient? _client;
         private string? _token;
+        private Timer _timer;
+
+        Handlers handlers;
+        Commands commands;
 
         public static Task Main(string[] args) => new Program().MainAsync();
 
@@ -31,11 +35,12 @@ namespace JamieBot {
             _client.Ready += Ready;
 
             //Adds handlers
-            Handlers handlers = new Handlers(_client);
+            handlers = new Handlers(_client);
+            commands = new Commands(_client);
 
             //Adds command events
             _client.GuildMemberUpdated += handlers.GuildMemberUpdatedHandler;
-
+            _client.SlashCommandExecuted += commands.SlashCommandHandler;
 
             //Starts bot
             await _client.LoginAsync(TokenType.Bot, _token);
@@ -57,9 +62,11 @@ namespace JamieBot {
         /// <summary>
         /// Prepares functions for the bot, such as time and new commands (if needed).
         /// </summary>
-        private Task Ready() {
+        private async Task Ready() {
 
-            return Task.CompletedTask;
+            _timer = new Timer(handlers.CheckRandomCondition, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+
+            //await Utilities.CreateCommands(_client);
         }
     }
 }
