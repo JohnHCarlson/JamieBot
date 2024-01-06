@@ -44,8 +44,11 @@ namespace JamieBot {
 
         private async Task Insult(SocketSlashCommand command) {
 
+            #if DEBUG
             String insult = LoadInsultsFromJson("..\\..\\..\\data.json");
-
+            #else
+            String insult = LoadInsultsFromJson("..\\JamieData\\data.json");
+            #endif
             SocketGuildUser user = (SocketGuildUser)command.Data.Options.First().Value;
             String updatedInsult = insult.Replace("%n", $"<@{user.Id}>");
 

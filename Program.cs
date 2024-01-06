@@ -27,8 +27,13 @@ namespace JamieBot {
             };
             _client = new DiscordSocketClient(config);
 
+
             //Reads token from source
+            #if DEBUG
             _token = File.ReadAllText("..\\..\\..\\token.txt");
+            #else
+            _token = File.ReadAllText("..\\JamieData\token.txt");
+            #endif
 
             //Adds meta events
             _client.Log += Log;
