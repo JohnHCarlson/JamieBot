@@ -1,0 +1,38 @@
+name: Deploy Jamie to Digital Ocean
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0
+
+      - name: Build
+        run: dotnet build
+
+      - name: Publish
+        run: dotnet publish -c Release
+
+      - name: Deploy to Digital Ocean
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DIGITAL_OCEAN_IP }}
+          username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
+          key: ${{ secrets.DIGITAL_OCEAN_SSH_KEY }}
+          port: 22
+          script: |
+            cd /home/JamieBot
+            git pull origin master
+            dotnet publish -c Release
+            sudo systemctl restart jamie-bot
