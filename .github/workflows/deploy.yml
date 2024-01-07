@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build Docker image
-        run: docker build . -t JohnHCarlson/JamieBot:latest
+        run: docker build . -t johnhcarlson/jamiebot:latest
    
       - name: Log into Docker Hub
         uses: docker/login-action@v2
@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Push the images to Docker Hub
-        run: docker push JohnHCarlson/JamieBot
+        run: docker push johnhcarlson/jamiebot
 
       - name: Pull the image to VM
         uses: appleboy/ssh-action@v1.0.0
@@ -31,8 +31,8 @@ jobs:
           username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
           key: ${{ secrets.DIGITAL_OCEAN_SSH_KEY }}
           script: | 
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/JamieBot:latest
-            docker stop JamieBot || true
-            docker rm JamieBot || true
-            docker run -d -p 80:80 --name JamieBot ${{ secrets.DOCKERHUB_USERNAME }}/JamieBot:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/jamiebot:latest
+            docker stop jamiebot || true
+            docker rm jamiebot || true
+            docker run -d -p 80:80 --name jamiebot ${{ secrets.DOCKERHUB_USERNAME }}/jamiebot:latest
 
