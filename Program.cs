@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
+using System.IO;
 
 namespace JamieBot {
     public class Program {
@@ -28,12 +29,22 @@ namespace JamieBot {
             _client = new DiscordSocketClient(config);
 
 
-            //Reads token from source
+            try {
+
+
+
+                //Reads token from source
             #if DEBUG
-            _token = File.ReadAllText("..\\..\\..\\token.txt");
+                _token = File.ReadAllText("..\\..\\..\\token.txt");
             #else
-            _token = File.ReadAllText("/data/token.txt");
+                _token = File.ReadAllText("/data/token.txt");
             #endif
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex);
+                Console.WriteLine(Directory.GetCurrentDirectory());
+            }
+
 
             //Adds meta events
             _client.Log += Log;
