@@ -37,7 +37,7 @@ namespace JamieBot {
             #if DEBUG
                 _token = File.ReadAllText("..\\..\\..\\token.txt");
             #else
-                _token = File.ReadAllText("/data/token.txt");
+                _token = File.ReadAllText("data/token.txt");
             #endif
             }
             catch (Exception ex) {
