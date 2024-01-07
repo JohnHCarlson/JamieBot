@@ -46,9 +46,9 @@ namespace JamieBot {
 
             #if DEBUG
             String insult = LoadInsultsFromJson("..\\..\\..\\data.json");
-            #else
-            String insult = LoadInsultsFromJson("..\\JamieData\\data.json");
-            #endif
+#else
+            String insult = LoadInsultsFromJson("data/data.json");
+#endif
             SocketGuildUser user = (SocketGuildUser)command.Data.Options.First().Value;
             String updatedInsult = insult.Replace("%n", $"<@{user.Id}>");
 
