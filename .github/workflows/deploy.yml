@@ -30,6 +30,7 @@ jobs:
           host: ${{ secrets.DIGITAL_OCEAN_IP }}
           username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
           key: ${{ secrets.DIGITAL_OCEAN_SSH_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           script: | 
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/jamiebot:latest
             docker stop jamiebot || true
