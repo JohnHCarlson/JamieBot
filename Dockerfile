@@ -9,5 +9,6 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /JamieBot
 COPY --from=build /JamieBot/out .
+COPY /home/JamieData /JamieBot/JamieData
 ENV ASPNETCORE_URLS=http://*:80
 CMD dotnet JamieBot.dll
