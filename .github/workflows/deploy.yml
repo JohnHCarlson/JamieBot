@@ -2,37 +2,37 @@ name: Deploy Jamie to Digital Ocean
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+      - name: Build Docker image
+        run: docker build . -t JohnHCarlson/JamieBot:latest
+   
+      - name: Log into Docker Hub
+        uses: docker/login-action@v2
         with:
-          dotnet-version: 6.0.125
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build
-        run: dotnet build
+      - name: Push the images to Docker Hub
+        run: docker push JohnHCarlson/JamieBot
 
-      - name: Publish
-        run: dotnet publish -c Release
-
-      - name: Deploy to Digital Ocean
-        uses: appleboy/ssh-action@master
+      - name: Pull the image to VM
+        uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.DIGITAL_OCEAN_IP }}
           username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
           key: ${{ secrets.DIGITAL_OCEAN_SSH_KEY }}
-          port: 22
-          script: |
-            cd /home/JamieBot
-            git pull origin master
-            dotnet publish -c Release
-            sudo systemctl restart jamie-bot
+          script: | 
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/JamieBot:latest
+            docker stop JamieBot || true
+            docker rm JamieBot || true
+            docker run -d -p 80:80 --name JamieBot ${{ secrets.DOCKERHUB_USERNAME }}/JamieBot:latest
+
