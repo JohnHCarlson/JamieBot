@@ -35,7 +35,7 @@ namespace JamieBot {
         }
 
         private async Task BogosBinted(SocketSlashCommand command) {
-            await command.RespondAsync("\u1f47D");
+            await command.RespondAsync("test response");
         }
 
         private async Task PhotosPrinted(SocketSlashCommand command) {
