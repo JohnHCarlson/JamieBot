@@ -1,25 +1,42 @@
-﻿using Discord;
+﻿using System;
+
+using Discord;
 using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
+
+using Lavalink4NET;
+using Lavalink4NET.Extensions;
+
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Lavalink4NET;
 
 namespace JamieBot {
     public class Program {
 
         public static DiscordSocketClient? _client;
+        public static IAudioService _audioService;
         private string? _token;
         private Timer _timer;
 
         Handlers handlers;
         Commands commands;
 
-        public static Task Main(string[] args) => new Program().MainAsync();
+        public static Task Main(string[] args) => new Program().MainAsync(args);
 
         /// <summary>
         /// Program entry point. 
         /// Inits bot data, event handlers, prepares bot.
         /// </summary>
-        public async Task MainAsync() {
+        public async Task MainAsync(string[] args) {
+
+            //
+            var serviceProvider = new ServiceCollection()
+                .AddLavalink()
+                .BuildServiceProvider();
+
+            _audioService = serviceProvider.GetRequiredService<IAudioService>();
 
             //Creates new client socket connection
             var config = new DiscordSocketConfig() { //TODO: update to specific intents instead of `GatewayIntents.All`
@@ -41,7 +58,7 @@ namespace JamieBot {
 
             //Adds handlers
             handlers = new Handlers(_client);
-            commands = new Commands(_client);
+            commands = new Commands(_client, _audioService);
 
             //Adds command events
             _client.GuildMemberUpdated += handlers.GuildMemberUpdatedHandler;
@@ -71,7 +88,7 @@ namespace JamieBot {
 
             _timer = new Timer(handlers.CheckRandomCondition, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
-            //await Utilities.CreateCommands(_client);
+            await Utilities.CreateCommands(_client);
         }
     }
 }
