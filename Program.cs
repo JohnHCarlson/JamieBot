@@ -88,7 +88,7 @@ namespace JamieBot {
 
             _timer = new Timer(handlers.CheckRandomCondition, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
-            await Utilities.CreateCommands(_client);
+            //await Utilities.CreateCommands(_client);
         }
     }
 }
