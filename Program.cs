@@ -1,29 +1,42 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Discord;
 using Discord.Commands;
 using Discord.Net;
 using Discord.WebSocket;
+using Discord.Interactions;
 
 using Lavalink4NET;
 using Lavalink4NET.Extensions;
 
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Lavalink4NET;
+using Discord.Interactions;
 
 namespace JamieBot {
     public class Program {
 
+        private static IConfiguration _configuration;
         public static DiscordSocketClient? _client;
         public static IAudioService _audioService;
         private string? _token;
         private Timer _timer;
 
+        private static IServiceProvider _services;
+
         Handlers handlers;
         Commands commands;
 
         public static Task Main(string[] args) => new Program().MainAsync(args);
+
+        private static readonly DiscordSocketConfig _socketConfig = new() {
+            GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers,
+            AlwaysDownloadUsers = true,
+        };
 
         /// <summary>
         /// Program entry point. 
@@ -31,38 +44,40 @@ namespace JamieBot {
         /// </summary>
         public async Task MainAsync(string[] args) {
 
-            //
-            var serviceProvider = new ServiceCollection()
+            _configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .Build();
+
+            _services = new ServiceCollection()
+                .AddSingleton(_socketConfig)
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
+                .AddSingleton<IConfiguration>(_configuration)
+                .AddSingleton<InteractionService>()
+                .AddSingleton<InteractionHandler>()
                 .AddLavalink()
                 .BuildServiceProvider();
 
-            _audioService = serviceProvider.GetRequiredService<IAudioService>();
+            _client = _services.GetRequiredService<DiscordSocketClient>();
+            _audioService = _services.GetRequiredService<IAudioService>();
 
-            //Creates new client socket connection
-            var config = new DiscordSocketConfig() { //TODO: update to specific intents instead of `GatewayIntents.All`
-                GatewayIntents = GatewayIntents.All
-            };
-            _client = new DiscordSocketClient(config);
+            _client.Log += LogAsync;
 
+            await _services.GetRequiredService<InteractionHandler>().InitalizeAsync();
 
-            //Reads token from source
+            //Adds handlers
+            //handlers = new Handlers(_client);
+            //commands = new Commands(_client, _audioService);
+
+            //Adds command events
+            //_client.GuildMemberUpdated += handlers.GuildMemberUpdatedHandler;
+            //_client.SlashCommandExecuted += commands.SlashCommandHandler;
+
             #if DEBUG
             _token = File.ReadAllText("..\\..\\..\\token.txt");
             #else
             _token = File.ReadAllText("..\\JamieData\token.txt");
             #endif
-
-            //Adds meta events
-            _client.Log += Log;
-            _client.Ready += Ready;
-
-            //Adds handlers
-            handlers = new Handlers(_client);
-            commands = new Commands(_client, _audioService);
-
-            //Adds command events
-            _client.GuildMemberUpdated += handlers.GuildMemberUpdatedHandler;
-            _client.SlashCommandExecuted += commands.SlashCommandHandler;
 
             //Starts bot
             await _client.LoginAsync(TokenType.Bot, _token);
@@ -72,23 +87,8 @@ namespace JamieBot {
             await Task.Delay(-1);
         }
 
-        /// <summary>
-        /// TODO: Implement actual logging
-        /// </summary>
-        private Task Log(LogMessage msg) {
-
-            Console.WriteLine(msg);
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Prepares functions for the bot, such as time and new commands (if needed).
-        /// </summary>
-        private async Task Ready() {
-
-            _timer = new Timer(handlers.CheckRandomCondition, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-
-            //await Utilities.CreateCommands(_client);
+        private static async Task LogAsync(LogMessage message) {
+            Console.WriteLine(message.ToString());
         }
     }
 }
