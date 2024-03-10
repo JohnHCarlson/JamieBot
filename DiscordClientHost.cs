@@ -66,7 +66,7 @@ internal class DiscordClientHost : IHostedService {
 #if DEBUG
         return File.ReadAllText("..\\..\\..\\token.txt");
 #else
-        return File.ReadAllText("..\\JamieData\token.txt");
+        return File.ReadAllText("data\token.txt");
 #endif
     }
 }
