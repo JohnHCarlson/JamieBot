@@ -26,16 +26,14 @@ public class Program {
 #if DEBUG
         String passphrase = File.ReadAllText("..\\..\\..\\passphrase.txt");
 #else
-        
         String passphrase = File.ReadAllText("data/passphrase.txt");
-        Console.WriteLine(passphrase);
-
 #endif
 
 
         //LavaLink4Net
         builder.Services.AddLavalink();
         builder.Services.ConfigureLavalink(config => {
+            config.BaseAddress = new Uri("http://localhost:2333");
             config.ReadyTimeout = TimeSpan.FromSeconds(10);
             config.Passphrase = passphrase;
         });
