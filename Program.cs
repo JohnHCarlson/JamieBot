@@ -25,7 +25,7 @@ public class Program {
 #if DEBUG
         String passphrase = File.ReadAllText("..\\..\\..\\token.txt");
 #else
-        String passphrase = File.ReadAllText(../JamieData/token.txt");
+        String passphrase = File.ReadAllText("../JamieData/token.txt");
 #endif
 
         //LavaLink4Net
