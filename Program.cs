@@ -1,34 +1,55 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Net;
+﻿namespace Jamie;
+
+using System.Threading;
+
+using Discord.Interactions;
 using Discord.WebSocket;
+<<<<<<< HEAD
+using Jamie;
+using Lavalink4NET;
+using Lavalink4NET.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+=======
 using System.IO;
+>>>>>>> b6e9b5c5349ee861d077be15ca15c2d737fad5fa
 
-namespace JamieBot {
-    public class Program {
+public class Program {
+    public static async Task Main(string[] args) {
 
-        public static DiscordSocketClient? _client;
-        private string? _token;
-        private Timer _timer;
+        var builder = new HostApplicationBuilder(args);
 
-        Handlers handlers;
-        Commands commands;
+        //Discord.net
+        builder.Services.AddSingleton<DiscordSocketClient>();
+        builder.Services.AddSingleton<InteractionService>();
+        builder.Services.AddHostedService<DiscordClientHost>();
 
-        public static Task Main(string[] args) => new Program().MainAsync();
+#if DEBUG
+        String passphrase = File.ReadAllText("..\\..\\..\\token.txt");
+#else
+        String passphrase = File.ReadAllText(../JamieData/token.txt");
+#endif
 
-        /// <summary>
-        /// Program entry point. 
-        /// Inits bot data, event handlers, prepares bot.
-        /// </summary>
-        public async Task MainAsync() {
+        //LavaLink4Net
+        builder.Services.AddLavalink();
+        builder.Services.ConfigureLavalink(config => {
+            config.ReadyTimeout = TimeSpan.FromSeconds(10);
+            config.Passphrase = passphrase;
+        });
+        builder.Services.AddLogging(x => x.AddConsole().SetMinimumLevel(LogLevel.Trace));
 
-            //Creates new client socket connection
-            var config = new DiscordSocketConfig() { //TODO: update to specific intents instead of `GatewayIntents.All`
-                GatewayIntents = GatewayIntents.All
-            };
-            _client = new DiscordSocketClient(config);
+        //Adding modules
+        builder.Services.AddSingleton<MusicModule>();
 
+        //Subscribe to specific module events
+        var app = builder.Build();
 
+<<<<<<< HEAD
+        var musicModule = app.Services.GetRequiredService<MusicModule>();
+        app.Services.GetRequiredService<IAudioService>().TrackStarted += musicModule.TrackStarted;
+        app.Services.GetRequiredService<IAudioService>().TrackEnded += musicModule.TrackEnded;
+=======
             try {
 
 
@@ -45,44 +66,8 @@ namespace JamieBot {
                 Console.WriteLine(Directory.GetCurrentDirectory());
             }
 
+>>>>>>> b6e9b5c5349ee861d077be15ca15c2d737fad5fa
 
-            //Adds meta events
-            _client.Log += Log;
-            _client.Ready += Ready;
-
-            //Adds handlers
-            handlers = new Handlers(_client);
-            commands = new Commands(_client);
-
-            //Adds command events
-            _client.GuildMemberUpdated += handlers.GuildMemberUpdatedHandler;
-            _client.SlashCommandExecuted += commands.SlashCommandHandler;
-
-            //Starts bot
-            await _client.LoginAsync(TokenType.Bot, _token);
-            await _client.StartAsync();
-
-            //Blocks to allow bot to stay online
-            await Task.Delay(-1);
-        }
-
-        /// <summary>
-        /// TODO: Implement actual logging
-        /// </summary>
-        private Task Log(LogMessage msg) {
-
-            Console.WriteLine(msg);
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Prepares functions for the bot, such as time and new commands (if needed).
-        /// </summary>
-        private async Task Ready() {
-
-            _timer = new Timer(handlers.CheckRandomCondition, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-
-            //await Utilities.CreateCommands(_client);
-        }
+        app.Run();
     }
 }
