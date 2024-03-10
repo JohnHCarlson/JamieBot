@@ -23,9 +23,9 @@ public class Program {
         builder.Services.AddHostedService<DiscordClientHost>();
 
 #if DEBUG
-        String passphrase = File.ReadAllText("..\\..\\..\\token.txt");
+        String passphrase = File.ReadAllText("..\\..\\..\\passphrase.txt");
 #else
-        String passphrase = File.ReadAllText("../JamieData/token.txt");
+        String passphrase = File.ReadAllText("../JamieData/passphrase.txt");
 #endif
 
         //LavaLink4Net

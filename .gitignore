@@ -5,6 +5,7 @@
 
 #Tokens and anonymous / local  data
 token.txt
+passphrase.txt
 data.json
 
 # User-specific files
