@@ -45,21 +45,6 @@ public class Program {
         var musicModule = app.Services.GetRequiredService<MusicModule>();
         app.Services.GetRequiredService<IAudioService>().TrackStarted += musicModule.TrackStarted;
         app.Services.GetRequiredService<IAudioService>().TrackEnded += musicModule.TrackEnded;
-            try {
-
-
-
-                //Reads token from source
-            #if DEBUG
-                _token = File.ReadAllText("..\\..\\..\\token.txt");
-            #else
-                _token = File.ReadAllText("data/token.txt");
-            #endif
-            }
-            catch (Exception ex) {
-                Console.WriteLine(ex);
-                Console.WriteLine(Directory.GetCurrentDirectory());
-            }
 
         app.Run();
     }
