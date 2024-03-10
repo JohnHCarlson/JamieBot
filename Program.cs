@@ -28,6 +28,8 @@ public class Program {
 #else
         
         String passphrase = File.ReadAllText("data/passphrase.txt");
+        Console.WriteLine(passphrase);
+
 #endif
 
 
