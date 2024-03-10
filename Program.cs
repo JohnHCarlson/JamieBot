@@ -22,11 +22,14 @@ public class Program {
         builder.Services.AddSingleton<InteractionService>();
         builder.Services.AddHostedService<DiscordClientHost>();
 
+        Console.WriteLine(Directory.GetCurrentDirectory());
 #if DEBUG
         String passphrase = File.ReadAllText("..\\..\\..\\passphrase.txt");
 #else
+        
         String passphrase = File.ReadAllText("../JamieData/passphrase.txt");
 #endif
+
 
         //LavaLink4Net
         builder.Services.AddLavalink();
