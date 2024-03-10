@@ -27,7 +27,7 @@ public class Program {
         String passphrase = File.ReadAllText("..\\..\\..\\passphrase.txt");
 #else
         
-        String passphrase = File.ReadAllText("..\\JamieData\passphrase.txt");
+        String passphrase = File.ReadAllText("..\\JamieData\\passphrase.txt");
 #endif
 
 
