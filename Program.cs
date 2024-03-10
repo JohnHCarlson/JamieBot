@@ -4,12 +4,16 @@ using System.Threading;
 
 using Discord.Interactions;
 using Discord.WebSocket;
+<<<<<<< HEAD
 using Jamie;
 using Lavalink4NET;
 using Lavalink4NET.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+=======
+using System.IO;
+>>>>>>> b6e9b5c5349ee861d077be15ca15c2d737fad5fa
 
 public class Program {
     public static async Task Main(string[] args) {
@@ -41,9 +45,28 @@ public class Program {
         //Subscribe to specific module events
         var app = builder.Build();
 
+<<<<<<< HEAD
         var musicModule = app.Services.GetRequiredService<MusicModule>();
         app.Services.GetRequiredService<IAudioService>().TrackStarted += musicModule.TrackStarted;
         app.Services.GetRequiredService<IAudioService>().TrackEnded += musicModule.TrackEnded;
+=======
+            try {
+
+
+
+                //Reads token from source
+            #if DEBUG
+                _token = File.ReadAllText("..\\..\\..\\token.txt");
+            #else
+                _token = File.ReadAllText("data/token.txt");
+            #endif
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex);
+                Console.WriteLine(Directory.GetCurrentDirectory());
+            }
+
+>>>>>>> b6e9b5c5349ee861d077be15ca15c2d737fad5fa
 
         app.Run();
     }
