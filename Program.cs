@@ -1,94 +1,50 @@
-﻿using System;
+﻿namespace Jamie;
+
 using System.Threading;
-using System.Threading.Tasks;
 
-using Discord;
-using Discord.Commands;
-using Discord.Net;
-using Discord.WebSocket;
 using Discord.Interactions;
-
+using Discord.WebSocket;
+using Jamie;
 using Lavalink4NET;
 using Lavalink4NET.Extensions;
-
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Lavalink4NET;
-using Discord.Interactions;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace JamieBot {
-    public class Program {
+public class Program {
+    public static async Task Main(string[] args) {
 
-        private static IConfiguration _configuration;
-        public static DiscordSocketClient? _client;
-        public static IAudioService _audioService;
-        private string? _token;
-        private Timer _timer;
+        var builder = new HostApplicationBuilder(args);
 
-        private static IServiceProvider _services;
+        //Discord.net
+        builder.Services.AddSingleton<DiscordSocketClient>();
+        builder.Services.AddSingleton<InteractionService>();
+        builder.Services.AddHostedService<DiscordClientHost>();
 
-        Handlers handlers;
-        Commands commands;
+#if DEBUG
+        String passphrase = File.ReadAllText("..\\..\\..\\token.txt");
+#else
+        String passphrase = File.ReadAllText(../JamieData/token.txt");
+#endif
 
-        public static Task Main(string[] args) => new Program().MainAsync(args);
+        //LavaLink4Net
+        builder.Services.AddLavalink();
+        builder.Services.ConfigureLavalink(config => {
+            config.ReadyTimeout = TimeSpan.FromSeconds(10);
+            config.Passphrase = passphrase;
+        });
+        builder.Services.AddLogging(x => x.AddConsole().SetMinimumLevel(LogLevel.Trace));
 
-        private static readonly DiscordSocketConfig _socketConfig = new() {
-            GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers,
-            AlwaysDownloadUsers = true,
-        };
+        //Adding modules
+        builder.Services.AddSingleton<MusicModule>();
 
-        /// <summary>
-        /// Program entry point. 
-        /// Inits bot data, event handlers, prepares bot.
-        /// </summary>
-        public async Task MainAsync(string[] args) {
+        //Subscribe to specific module events
+        var app = builder.Build();
 
-            _configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true)
-            .Build();
+        var musicModule = app.Services.GetRequiredService<MusicModule>();
+        app.Services.GetRequiredService<IAudioService>().TrackStarted += musicModule.TrackStarted;
+        app.Services.GetRequiredService<IAudioService>().TrackEnded += musicModule.TrackEnded;
 
-            _services = new ServiceCollection()
-                .AddSingleton(_socketConfig)
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
-                .AddSingleton<IConfiguration>(_configuration)
-                .AddSingleton<InteractionService>()
-                .AddSingleton<InteractionHandler>()
-                .AddLavalink()
-                .BuildServiceProvider();
-
-            _client = _services.GetRequiredService<DiscordSocketClient>();
-            _audioService = _services.GetRequiredService<IAudioService>();
-
-            _client.Log += LogAsync;
-
-            await _services.GetRequiredService<InteractionHandler>().InitalizeAsync();
-
-            //Adds handlers
-            //handlers = new Handlers(_client);
-            //commands = new Commands(_client, _audioService);
-
-            //Adds command events
-            //_client.GuildMemberUpdated += handlers.GuildMemberUpdatedHandler;
-            //_client.SlashCommandExecuted += commands.SlashCommandHandler;
-
-            #if DEBUG
-            _token = File.ReadAllText("..\\..\\..\\token.txt");
-            #else
-            _token = File.ReadAllText("..\\JamieData\token.txt");
-            #endif
-
-            //Starts bot
-            await _client.LoginAsync(TokenType.Bot, _token);
-            await _client.StartAsync();
-
-            //Blocks to allow bot to stay online
-            await Task.Delay(-1);
-        }
-
-        private static async Task LogAsync(LogMessage message) {
-            Console.WriteLine(message.ToString());
-        }
+        app.Run();
     }
 }
