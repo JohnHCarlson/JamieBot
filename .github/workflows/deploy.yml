@@ -35,5 +35,5 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/jamiebot:latest
             docker stop jamiebot || true
             docker rm jamiebot || true
-            docker run -d -p 80:80 -p 2333:2333 -v /home/JamieData:/JamieBot/data --name jamiebot ${{ secrets.DOCKERHUB_USERNAME }}/jamiebot:latest
+            docker run -d -p 80:80 -p 2334:2333 --network host -v /home/JamieData:/JamieBot/data --name jamiebot ${{ secrets.DOCKERHUB_USERNAME }}/jamiebot:latest
 
