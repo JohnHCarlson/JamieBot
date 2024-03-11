@@ -56,6 +56,8 @@ internal class DiscordClientHost : IHostedService {
             .AddModulesAsync(Assembly.GetExecutingAssembly(), _serviceProvider)
             .ConfigureAwait(false);
 
+        await _client.Rest.DeleteAllGlobalCommandsAsync();
+
         //REGISTER COMMANDS HERE
         await _interactionService
             .RegisterCommandsGloballyAsync(true)
