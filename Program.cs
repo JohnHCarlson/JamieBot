@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 public class Program {
     public static async Task Main(string[] args) {
@@ -38,6 +39,8 @@ public class Program {
             config.Passphrase = passphrase;
         });
         builder.Services.AddLogging(x => x.AddConsole().SetMinimumLevel(LogLevel.Trace));
+        
+        builder.Services.Replace(ServiceDescriptor.Singleton<IHostLifetime, EmptyLifetime>());
 
         //Adding modules
         builder.Services.AddSingleton<MusicModule>();
@@ -51,4 +54,10 @@ public class Program {
 
         app.Run();
     }
+}
+
+file sealed class EmptyLifetime : IHostLifetime {
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task WaitForStartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }
