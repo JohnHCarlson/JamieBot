@@ -12,9 +12,22 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Runtime.InteropServices;
+
+
 
 public class Program {
+
+    static void HandleSignal(PosixSignalContext context) => context.Cancel = true;
+
+
+
     public static async Task Main(string[] args) {
+
+        PosixSignalRegistration.Create(PosixSignal.SIGHUP, HandleSignal);
+        PosixSignalRegistration.Create(PosixSignal.SIGINT, HandleSignal);
+        PosixSignalRegistration.Create(PosixSignal.SIGQUIT, HandleSignal);
+        PosixSignalRegistration.Create(PosixSignal.SIGTERM, HandleSignal);
 
         var builder = new HostApplicationBuilder(args);
 
