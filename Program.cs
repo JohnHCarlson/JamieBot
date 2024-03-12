@@ -40,7 +40,7 @@ public class Program {
 #if DEBUG
         String passphrase = File.ReadAllText("..\\..\\..\\passphrase.txt");
 #else
-        String passphrase = File.ReadAllText("data/passephrase.txt");
+        String passphrase = File.ReadAllText("data/passphrase.txt");
 #endif
 
 
