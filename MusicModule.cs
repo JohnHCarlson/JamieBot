@@ -225,7 +225,7 @@ public class MusicModule : InteractionModuleBase<SocketInteractionContext> {
         var player = args.Player;
         var builder = GetControls();
 
-        var channel = await _client.GetChannelAsync(1200875387824119879).ConfigureAwait(false) as IMessageChannel;
+        var channel = await _client.GetChannelAsync(1188565886425112697).ConfigureAwait(false) as IMessageChannel;
 
         var embed = new EmbedBuilder() {
             Title = $"Currently playing: {track.Title}",
@@ -244,7 +244,7 @@ public class MusicModule : InteractionModuleBase<SocketInteractionContext> {
     /// </summary>
     internal async Task TrackEnded(object sender, TrackEndedEventArgs args) {
 
-        var channel = await _client.GetChannelAsync(1200875387824119879).ConfigureAwait(false) as IMessageChannel;
+        var channel = await _client.GetChannelAsync(1188565886425112697).ConfigureAwait(false) as IMessageChannel;
         await channel.DeleteMessageAsync(statusMessageId).ConfigureAwait(false);
     }
 

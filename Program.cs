@@ -18,16 +18,7 @@ using System.Runtime.InteropServices;
 
 public class Program {
 
-    static void HandleSignal(PosixSignalContext context) => context.Cancel = true;
-
-
-
     public static async Task Main(string[] args) {
-
-        PosixSignalRegistration.Create(PosixSignal.SIGHUP, HandleSignal);
-        PosixSignalRegistration.Create(PosixSignal.SIGINT, HandleSignal);
-        PosixSignalRegistration.Create(PosixSignal.SIGQUIT, HandleSignal);
-        PosixSignalRegistration.Create(PosixSignal.SIGTERM, HandleSignal);
 
         var builder = new HostApplicationBuilder(args);
 
@@ -40,7 +31,7 @@ public class Program {
 #if DEBUG
         String passphrase = File.ReadAllText("..\\..\\..\\passphrase.txt");
 #else
-        String passphrase = File.ReadAllText("data/passephrase.txt");
+        String passphrase = File.ReadAllText("data/passphrase.txt");
 #endif
 
 
