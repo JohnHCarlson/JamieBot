@@ -295,5 +295,18 @@ public class MusicModule : InteractionModuleBase<SocketInteractionContext> {
         }
         return result.Player;
     }
+
+    private async ValueTask<IChannel> GetChannel() {
+        ulong channel_id = 1188565886425112697;
+
+        try {
+            return await _client.GetChannelAsync(channel_id).ConfigureAwait(false) as IMessageChannel;
+        }
+        catch(Exception ex) {
+            Console.WriteLine($"Unable to find channel with ID: {channel_id}.");
+            Console.WriteLine(ex.Message);
+            return null;
+        }
+    }
 }
 

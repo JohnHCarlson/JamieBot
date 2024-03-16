@@ -27,11 +27,18 @@ public class Program {
         builder.Services.AddSingleton<InteractionService>();
         builder.Services.AddHostedService<DiscordClientHost>();
 
-        Console.WriteLine(Directory.GetCurrentDirectory());
-#if DEBUG
-        String passphrase = File.ReadAllText("..\\..\\..\\passphrase.txt");
+        String passphrase = "youshallnotpass";
+
+#if DEBUG //uses default password if debug
 #else
-        String passphrase = File.ReadAllText("data/passphrase.txt");
+            try {
+            passphrase = File.ReadAllText("data/passphrase.txt");
+
+        } 
+        catch (Exception ex) {
+            Console.WriteLine("Unable to find passphrase at \"data/passphrase.txt\"");
+            Console.WriteLine(ex.Message);
+        }
 #endif
 
 

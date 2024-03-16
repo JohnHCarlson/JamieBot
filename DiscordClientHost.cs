@@ -66,9 +66,22 @@ internal class DiscordClientHost : IHostedService {
 
     private string getToken() {
 #if DEBUG
+    try{
         return File.ReadAllText("..\\..\\..\\token.txt");
+    }
+    catch(Exception ex) {
+        Console.WriteLine("Unable to find token at \"..\\..\\..\\token.txt\"");
+        Console.WriteLine(ex.Message);
+    }
 #else
-        return File.ReadAllText("data/token.txt");
+    try{
+         return File.ReadAllText("data/token.txt");
+    }
+    catch(Exception ex) {
+        Console.WriteLine("Unable to find token at \"..\\..\\..\\token.txt\"");
+        Console.WriteLine(ex.Message);
+    }   
 #endif
+        return "";
     }
 }
