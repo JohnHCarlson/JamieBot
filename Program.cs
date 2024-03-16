@@ -12,8 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-
- 
+using System.Net.Http.Json;
 
 public class Program {
 
@@ -97,6 +96,8 @@ file sealed class HttpLogger : IHttpClientAsyncLogger {
 
                 {{requestBody}}
                 """);
+
+            Console.WriteLine(((JsonContent)request.Content).Value.ToString());
         }
 
         return null;
