@@ -221,21 +221,27 @@ public class MusicModule : InteractionModuleBase<SocketInteractionContext> {
     /// </summary>
     internal async Task TrackStarted(object sender, TrackStartedEventArgs args) {
 
-        var track = args.Track;
-        var player = args.Player;
-        var builder = GetControls();
+        try {
+            var track = args.Track;
+            var player = args.Player;
+            var builder = GetControls();
 
-        var channel = await _client.GetChannelAsync(1188565886425112697).ConfigureAwait(false) as IMessageChannel;
+            var channel = await _client.GetChannelAsync(1188565886425112697).ConfigureAwait(false) as IMessageChannel;
 
-        var embed = new EmbedBuilder() {
-            Title = $"Currently playing: {track.Title}",
-            Timestamp = DateTime.Now,
-            Url = track.Uri.ToString(),
-            ImageUrl = track.ArtworkUri.ToString()
-        };
+            var embed = new EmbedBuilder() {
+                Title = $"Currently playing: {track.Title}",
+                Timestamp = DateTime.Now,
+                Url = track.Uri.ToString(),
+                ImageUrl = track.ArtworkUri.ToString()
+            };
 
-        IMessage message = await channel.SendMessageAsync(embed: embed.Build(), components: builder).ConfigureAwait(false);
-        statusMessageId = message.Id;
+            IMessage message = await channel.SendMessageAsync(embed: embed.Build(), components: builder).ConfigureAwait(false);
+            statusMessageId = message.Id;
+        }
+        catch(Exception ex) {
+            Console.WriteLine(ex.ToString());
+        }
+
     }
 
     /// <summary>
@@ -244,8 +250,14 @@ public class MusicModule : InteractionModuleBase<SocketInteractionContext> {
     /// </summary>
     internal async Task TrackEnded(object sender, TrackEndedEventArgs args) {
 
-        var channel = await _client.GetChannelAsync(1188565886425112697).ConfigureAwait(false) as IMessageChannel;
-        await channel.DeleteMessageAsync(statusMessageId).ConfigureAwait(false);
+        try {
+            var channel = await _client.GetChannelAsync(1188565886425112697).ConfigureAwait(false) as IMessageChannel;
+            await channel.DeleteMessageAsync(statusMessageId).ConfigureAwait(false);
+        }
+        catch(Exception ex) {
+            Console.WriteLine(ex.ToString());
+        }
+
     }
 
     /// <summary>
