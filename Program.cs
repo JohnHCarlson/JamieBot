@@ -5,16 +5,15 @@ using System.Threading;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Jamie;
+using Microsoft.Extensions.Http.Logging;
 using Lavalink4NET;
 using Lavalink4NET.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.IO;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Runtime.InteropServices;
 
-
+ 
 
 public class Program {
 
@@ -50,7 +49,10 @@ public class Program {
             config.Passphrase = passphrase;
         });
         builder.Services.AddLogging(x => x.AddConsole().SetMinimumLevel(LogLevel.Trace));
-        
+        builder.Services.AddHttpClient(string.Empty).AddLogger<HttpLogger>();
+        builder.Services.AddSingleton<HttpLogger>();
+
+
         builder.Services.Replace(ServiceDescriptor.Singleton<IHostLifetime, EmptyLifetime>());
 
         //Adding modules
@@ -71,4 +73,39 @@ file sealed class EmptyLifetime : IHostLifetime {
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task WaitForStartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+}
+
+file sealed class HttpLogger : IHttpClientAsyncLogger {
+    public void LogRequestFailed(object? context, HttpRequestMessage request, HttpResponseMessage? response, Exception exception, TimeSpan elapsed) {
+    }
+
+    public ValueTask LogRequestFailedAsync(object? context, HttpRequestMessage request, HttpResponseMessage? response, Exception exception, TimeSpan elapsed, CancellationToken cancellationToken = default) {
+        return default;
+    }
+
+    public object? LogRequestStart(HttpRequestMessage request) {
+        return null;
+    }
+
+    public async ValueTask<object?> LogRequestStartAsync(HttpRequestMessage request, CancellationToken cancellationToken = default) {
+        if (request.Content is not null) {
+            var requestBody = await request.Content.ReadAsStringAsync(cancellationToken);
+
+            Console.WriteLine($$"""
+                Sending HTTP/{{request.Version}} {{request.Method}} {{request.RequestUri}}
+                {{string.Join("\n", request.Headers.Select(x => $"{x.Key}: {string.Join(';', x.Value)}"))}}
+
+                {{requestBody}}
+                """);
+        }
+
+        return null;
+    }
+
+    public void LogRequestStop(object? context, HttpRequestMessage request, HttpResponseMessage response, TimeSpan elapsed) {
+    }
+
+    public ValueTask LogRequestStopAsync(object? context, HttpRequestMessage request, HttpResponseMessage response, TimeSpan elapsed, CancellationToken cancellationToken = default) {
+        return default;
+    }
 }
